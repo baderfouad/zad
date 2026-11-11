@@ -48,7 +48,7 @@ button, input, select { font: inherit; color: inherit; }
 button { cursor: pointer; }
 :focus-visible { outline: 3px solid var(--saffron); outline-offset: 2px; border-radius: 4px; }
 main:focus { outline: none; }
-.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.sr { position: absolute; left: 0; top: 0; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .num { font-variant-numeric: tabular-nums; }
 .wrap { width: 100%; max-width: 1240px; margin-inline: auto; padding-inline: var(--gutter); }
 .state { padding-block: 80px; text-align: center; color: var(--ink2); font-size: 1.1rem; }
@@ -367,7 +367,7 @@ table.log.prep th, table.log.prep td { white-space: nowrap; }
 .tabs button { min-height: 44px; padding: 8px 14px; border: 0; background: none; font-weight: 700; color: var(--ink2); border-bottom: 3px solid transparent; margin-bottom: -2px; }
 .tabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--saffron); }
 .tabs button .badge { font-size: .7rem; background: var(--saffron); color: var(--on-saffron); border-radius: 999px; padding: 1px 7px; margin-inline-start: 6px; }
-.tbl-wrap { overflow: auto; max-height: 560px; border: 1px solid var(--line); border-radius: 6px; background: var(--card); }
+.tbl-wrap { position: relative; overflow: auto; max-height: 560px; border: 1px solid var(--line); border-radius: 6px; background: var(--card); }
 table.raw { border-collapse: collapse; font-size: .85rem; width: 100%; }
 table.raw th, table.raw td { padding: 6px 10px; border-bottom: 1px solid var(--line); text-align: start; white-space: nowrap; }
 table.raw th { position: sticky; top: 0; background: var(--card); font-family: ui-monospace, monospace; font-size: .78rem; box-shadow: 0 2px 0 var(--line); }

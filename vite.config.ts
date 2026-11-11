@@ -11,7 +11,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['icon.svg', 'data/*.csv'],
+      includeAssets: ['icon.svg'],
       manifest: {
         name: 'Zad · زاد',
         short_name: 'Zad',
@@ -29,7 +29,10 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,svg,png,csv}'],
+        // CSVs are NOT precached: they use the NetworkFirst rule below so edits show after a reload.
+        globPatterns: ['**/*.{js,css,html,svg,png}'],
+        clientsClaim: true,
+        skipWaiting: true,
         navigateFallback: 'index.html',
         runtimeCaching: [
           {
