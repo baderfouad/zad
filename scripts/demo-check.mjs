@@ -28,7 +28,7 @@ for (const route of routes.length ? routes : all) {
     const tag = `${route}-${s.w}-${lang}-${theme}`;
     page.on('console', (m) => { if (['error', 'warning'].includes(m.type())) problems.push(`${tag}: console ${m.type()}: ${m.text()}`); });
     page.on('pageerror', (e) => problems.push(`${tag}: page error: ${e.message}`));
-    await page.goto(BASE + (route === 'about' ? '#/' : `#/${route}`), { waitUntil: 'networkidle' });
+    await page.goto(BASE + `#${route}`, { waitUntil: 'networkidle' });
     await page.waitForSelector('main h1', { timeout: 10000 }).catch(() => problems.push(`${tag}: no h1 rendered`));
     await page.evaluate(() => document.fonts.ready);
     const m = await page.evaluate(() => ({

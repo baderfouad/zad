@@ -4,3 +4,4 @@ checks
 *.log
 .DS_Store
 screenshots
+dist-artifact

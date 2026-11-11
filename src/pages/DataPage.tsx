@@ -95,7 +95,7 @@ export function DataPage() {
         <div className="up-row" style={{ marginBottom: 10 }}>
           <b dir="ltr">{tab}.csv</b>
           <span className="note">{fill(t.rows, { n: n(raw.rows.length) })}{raw.rows.length > MAX_ROWS && ` · ${fill(t.showing, { n: n(MAX_ROWS) })}`}</span>
-          <button type="button" className="linkbtn" onClick={download}>{fill(t.download, { f: tab })}</button>
+          {!import.meta.env.VITE_ARTIFACT && <button type="button" className="linkbtn" onClick={download}>{fill(t.download, { f: tab })}</button>}
         </div>
         <div className="tbl-wrap" tabIndex={0} role="region" aria-label={fill(t.tableCaption, { f: tab })}>
           <table className="raw" dir="ltr">

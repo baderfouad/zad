@@ -16,7 +16,7 @@ createRoot(document.getElementById('root')!).render(
 
 // Service worker: caches the app and data so it keeps working if the venue Wi-Fi drops.
 // Once it controls the page, fetch the data again through it so the CSVs are cached for offline use from the first visit.
-if (import.meta.env.PROD) {
+if (import.meta.env.PROD && !import.meta.env.VITE_ARTIFACT) {
   registerSW({ immediate: true });
   void warmDataCache();
 }

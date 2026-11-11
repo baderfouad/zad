@@ -6,10 +6,10 @@ A student research prototype. **All businesses and numbers are sample data.**
 
 | Page | Route | For |
 |---|---|---|
-| About | `#/` | Judges: the story in under a minute, with a live "tomorrow's prep ticket" |
-| Owner | `#/owner` | The owner, on a phone, in Arabic: "Tomorrow, cook about X kg" |
-| Kitchen | `#/kitchen` | Head chef: tile dashboard, "Why this number?", model accuracy, leftover log |
-| Data | `#/data` | Every CSV as a table, data warnings, and a session-only CSV upload |
+| About | `#about` | Judges: the story in under a minute, with a live "tomorrow's prep ticket" |
+| Owner | `#owner` | The owner, on a phone, in Arabic: "Tomorrow, cook about X kg" |
+| Kitchen | `#kitchen` | Head chef: tile dashboard, "Why this number?", model accuracy, leftover log |
+| Data | `#data` | Every CSV as a table, data warnings, and a session-only CSV upload |
 
 Arabic (RTL) is the default; English is one tap away. Venue, language and theme are remembered. It works offline after the first visit.
 

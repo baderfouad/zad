@@ -126,7 +126,7 @@ export function Owner() {
           <h2 id="left-h">{t.oLeftH}</h2>
           <p>{left.safe > 0 ? <Rich s={t.oLeftP} v={{ kg: n(left.safe, 1), m: n(left.meals) }} /> : t.oLeftNone}</p>
           <DonateButton />
-          <a className="note" href={href('kitchen') + '#log'} onClick={(e) => { e.preventDefault(); location.hash = '#/kitchen'; setTimeout(() => document.getElementById('log')?.scrollIntoView(), 50); }}>{t.oLeftEdit}</a>
+          <a className="note" href={href('kitchen') + '#log'} onClick={(e) => { e.preventDefault(); location.hash = '#kitchen'; setTimeout(() => document.getElementById('log')?.scrollIntoView(), 50); }}>{t.oLeftEdit}</a>
         </section>
       </div>
     </div>

@@ -7,7 +7,8 @@ const parse = (): Route => {
   const h = location.hash.replace(/^#\/?/, '').split(/[?/]/)[0];
   return (ROUTES as string[]).includes(h) ? (h as Route) : 'about';
 };
-export const href = (r: Route) => (r === 'about' ? '#/' : `#/${r}`);
+/** Plain #name links (#owner, #kitchen…). #/owner still works for old links. */
+export const href = (r: Route) => `#${r}`;
 
 export function useRoute(): Route {
   const [r, setR] = useState<Route>(parse);
