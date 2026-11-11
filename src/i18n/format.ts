@@ -45,3 +45,7 @@ export function fmtTime(lang: Lang, hhmm: string): string {
 /** Fills {name} placeholders. */
 export const fill = (s: string, vars: Record<string, string | number>) =>
   s.replace(/\{(\w+)\}/g, (_, k) => (k in vars ? String(vars[k]) : `{${k}}`));
+
+/** Reads a number typed with Western or Arabic-Indic digits ("٤١٥" → 415). */
+export const parseDigits = (s: string): number =>
+  Number(s.replace(/[٠-٩]/g, (c) => String('٠١٢٣٤٥٦٧٨٩'.indexOf(c))).replace(/[٫,]/g, '.').replace(/[^\d.-]/g, '') || NaN);
