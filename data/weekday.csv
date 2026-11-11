@@ -1,0 +1,15 @@
+venue_id,weekday,factor
+hotel,Sunday,1
+hotel,Monday,0.95
+hotel,Tuesday,0.94
+hotel,Wednesday,0.98
+hotel,Thursday,1.06
+hotel,Friday,1.12
+hotel,Saturday,1.08
+restaurant,Sunday,0.92
+restaurant,Monday,0.88
+restaurant,Tuesday,0.9
+restaurant,Wednesday,0.97
+restaurant,Thursday,1.12
+restaurant,Friday,1.2
+restaurant,Saturday,1.1

@@ -1,0 +1,11 @@
+setting,venue_id,value,note
+waste_share_overproduction,hotel,58,% of waste that is buffet leftovers (cooked but not taken)
+waste_share_plate,hotel,27,% of waste left on guests' plates
+waste_share_trimmings,hotel,15,% of waste from prep and trimmings
+waste_share_overproduction,restaurant,46,% of waste that was prepared but not ordered
+waste_share_plate,restaurant,38,% of waste left on guests' plates
+waste_share_trimmings,restaurant,16,% of waste from prep and trimmings
+donated_share,all,38,% of leftover food that was safe and given to Hifz Al Naama
+temp_tomorrow_c,all,29,Expected temperature tomorrow in °C (affects restaurants only)
+pickup_by,all,22:30,Latest pickup time for a donation (24-hour clock)
+hifz_url,all,,TODO(source): official Hifz Al Naama website. Leave blank to hide the link.

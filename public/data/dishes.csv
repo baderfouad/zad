@@ -1,0 +1,20 @@
+venue_id,dish_id,name_en,name_ar,service,station,grams_per_guest,cost_qar_per_kg
+hotel,shak,Shakshuka,شكشوكة,Breakfast,Hot line,70,14
+hotel,foul,Foul medames,فول مدمس,Breakfast,Hot line,60,9
+hotel,regag,Regag bread,خبز رقاق,Breakfast,Bakery,45,6
+hotel,fruit,Fresh fruit,فواكه,Breakfast,Cold,90,12
+hotel,rice,Machboos rice,أرز مجبوس,Lunch,Hot line,150,7
+hotel,chick,Grilled chicken,دجاج مشوي,Lunch,Grill,105,21
+hotel,salad,Salads,سلطات,Lunch,Cold,75,11
+hotel,ouzi,Lamb ouzi,لحم غوزي,Dinner,Hot line,85,44
+hotel,hamm,Hammour fish,سمك هامور,Dinner,Grill,70,52
+hotel,mezze,Hummus & mezze,حمص ومقبلات,Dinner,Cold,55,15
+hotel,umm,Umm Ali,أم علي,Dinner,Pastry,60,16
+restaurant,rice,Machboos rice,أرز مجبوس,All day,Hot line,160,7
+restaurant,chick,Grilled chicken,دجاج مشوي,All day,Grill,110,21
+restaurant,lamb,Lamb machboos,لحم مجبوس,All day,Hot line,70,44
+restaurant,fish,Grilled fish,سمك مشوي,All day,Grill,60,50
+restaurant,harees,Harees,هريس,All day,Hot line,50,9
+restaurant,salad,Salads,سلطات,All day,Cold,60,11
+restaurant,bread,Bread,خبز,All day,Bakery,50,5
+restaurant,luq,Luqaimat,لقيمات,All day,Pastry,35,13
