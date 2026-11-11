@@ -20,7 +20,9 @@ export const fmtPct = (lang: Lang, share: number, digits = 0) =>
 /** Signed number, e.g. "+12" / "−3" (true minus sign). */
 export const fmtSigned = (lang: Lang, n: number, digits = 0) => {
   const r = Number(n.toFixed(digits));
-  return (r > 0 ? '+' : r < 0 ? '−' : '') + fmtNum(lang, Math.abs(r), digits);
+  const out = (r > 0 ? '+' : r < 0 ? '−' : '') + fmtNum(lang, Math.abs(r), digits);
+  // keep the sign in front in Arabic (left-to-right isolate)
+  return lang === 'ar' && r !== 0 ? '\u2066' + out + '\u2069' : out;
 };
 
 /** Replaces Western digits inside free text, e.g. "+60" in a label. */
