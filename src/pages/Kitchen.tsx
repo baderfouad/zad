@@ -7,12 +7,12 @@ import { Upcoming } from '../components/Upcoming';
 import { HifzNearest } from '../components/HifzNearest';
 import { leftoverTotals } from '../data/derive';
 import { FEATURES, type VenueView } from '../forecast';
-import { digits, fill, fmtDate, parseDigits, weekdayName } from '../i18n/format';
+import { fill, fmtDate, parseDigits, weekdayName } from '../i18n/format';
 import { useApp } from '../state/AppState';
 import { useVenueView } from '../state/useVenueView';
 
 export function Kitchen() {
-  const { t, lang, data, scenario, setScenario } = useApp();
+  const { t, lang, data, setScenario } = useApp();
   const v = useVenueView();
   if (!v || !data) return <div className="wrap state">{t.noData}</div>;
   const vname = lang === 'ar' ? v.venue.nameAr : v.venue.nameEn;
@@ -28,20 +28,9 @@ export function Kitchen() {
         <form className="scen" onSubmit={(e) => e.preventDefault()}>
           <label className="fld">
             <span>{t.kDay}</span>
-            <input type="date" min={v.tomorrow} value={v.target} onChange={(e) => setScenario({ target: e.target.value || null, guests: null })} />
+            <input type="date" min={v.tomorrow} value={v.target} onChange={(e) => setScenario({ target: e.target.value || null })} />
           </label>
-          <NumField label={t.kGuests} value={v.guests} onChange={(x) => setScenario({ guests: x === null ? null : Math.max(0, Math.min(5000, Math.round(x))) })} />
-          <label className="fld">
-            <span>{t.kOcc}</span>
-            <select value={scenario.occasion ?? ''} onChange={(e) => setScenario({ occasion: e.target.value || null })}>
-              <option value="">{t.calAuto} · {t.occ[v.occ.id] ?? v.occ.id}</option>
-              {data.occasions.map((o) => <option key={o.id} value={o.id}>{t.occ[o.id] ?? o.id}</option>)}
-            </select>
-          </label>
-          <NumField label={t.kTemp} value={v.temp} className="temp" onChange={(x) => setScenario({ tempC: x })} />
-          {(scenario.guests !== null || scenario.tempC !== null || scenario.occasion !== null || !v.isTomorrow) && (
-            <button type="button" className="linkbtn" onClick={() => setScenario({ guests: null, tempC: null, occasion: null, target: null })}>{t.kReset}</button>
-          )}
+          {!v.isTomorrow && <button type="button" className="linkbtn" onClick={() => setScenario({ target: null })}>{t.backTomorrow}</button>}
         </form>
       </div>
 
@@ -74,26 +63,6 @@ export function Kitchen() {
         </section>
       </div>
     </div>
-  );
-}
-
-/** Text input that shows Arabic-Indic digits in Arabic and accepts either digit set. Empty means "use Zad's value". */
-function NumField({ label, value, onChange, className = '' }: { label: string; value: number | null; onChange: (x: number | null) => void; className?: string }) {
-  const { lang } = useApp();
-  const [draft, setDraft] = useState<string | null>(null);
-  const shown = draft ?? (value === null ? '' : digits(lang, String(value)));
-  return (
-    <label className={'fld ' + className}>
-      <span>{label}</span>
-      <input type="text" inputMode="decimal" autoComplete="off" value={shown}
-        onChange={(e) => {
-          setDraft(e.target.value);
-          const x = parseDigits(e.target.value);
-          if (e.target.value.trim() === '') onChange(null);
-          else if (Number.isFinite(x)) onChange(x);
-        }}
-        onBlur={() => setDraft(null)} />
-    </label>
   );
 }
 
@@ -271,7 +240,7 @@ function LeftTile() {
 }
 
 function WhyPanel({ v }: { v: VenueView }) {
-  const { t, n, signed, lang, scenario } = useApp();
+  const { t, n, signed, lang } = useApp();
   const s = v.steps;
   const steps = [
     { k: 'weekday', label: fill(t.why.weekday, { d: v.isWeekend ? fill(t.whyWeekend, { d: weekdayName(lang, v.target) }) : weekdayName(lang, v.target) }), d: s.weekday },
@@ -304,7 +273,6 @@ function WhyPanel({ v }: { v: VenueView }) {
         <div className="r total"><span className="lbl">{t.why.total}</span>{bar(lo, s.expected, 'tot')}<span className="val num">{n(s.expected)}</span></div>
       </div>
       <p className="foot">{fill(t.whyNote, { n: n(s.daysUsed), m: n(s.sameWeekdayDays), t: '×' + n(v.venue.trend, 2) })} · {t.guests}</p>
-      {scenario.guests !== null && <p className="own">{fill(t.whyOwn, { n: n(v.guests), e: n(s.expected) })}</p>}
     </section>
   );
 }

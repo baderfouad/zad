@@ -4,7 +4,7 @@ import { useApp } from '../state/AppState';
 
 /** What's coming up in Qatar's calendar, its expected effect on guests, and a button to plan that day. */
 export function Upcoming({ v, compact = false }: { v: VenueView; compact?: boolean }) {
-  const { t, n, lang, data, setScenario, signed } = useApp();
+  const { t, n, lang, data, setScenario, signedPct } = useApp();
   if (!v.upcoming.length) return <p className="note">{t.calNone}</p>;
   const range = (a: string, b: string) => {
     const f = (d: string) => fmtDate(lang, d, { day: 'numeric', month: 'long' });
@@ -25,7 +25,7 @@ export function Upcoming({ v, compact = false }: { v: VenueView; compact?: boole
             <div className="cal-what">
               <h3>{lang === 'ar' ? u.event.nameAr : u.event.nameEn}</h3>
               <p>
-                {occ && pctUp !== 0 && <span className="pill good">{fill(t.calEffect, { p: signed(pctUp) + (lang === 'ar' ? '٪' : '%') })}</span>}{' '}
+                {occ && pctUp !== 0 && <span className="pill good">{fill(t.calEffect, { p: signedPct(pctUp) })}</span>}{' '}
                 {!u.event.confirmed && <span className="note">{t.calExpected}</span>}
                 {u.event.source && <> · <a className="note" href={u.event.source} target="_blank" rel="noopener noreferrer">{t.calSource}</a></>}
               </p>

@@ -25,6 +25,13 @@ export const fmtSigned = (lang: Lang, n: number, digits = 0) => {
   return lang === 'ar' && r !== 0 ? '\u2066' + out + '\u2069' : out;
 };
 
+/** Signed percentage from a percent value, e.g. 18 → "+18%" / "+١٨٪" (sign and % kept together in Arabic). */
+export const fmtSignedPct = (lang: Lang, pctValue: number, digits = 0) => {
+  const r = Number(pctValue.toFixed(digits));
+  const out = (r > 0 ? '+' : r < 0 ? '−' : '') + fmtNum(lang, Math.abs(r), digits) + (lang === 'ar' ? '٪' : '%');
+  return lang === 'ar' ? '\u2066' + out + '\u2069' : out;
+};
+
 /** Replaces Western digits inside free text, e.g. "+60" in a label. */
 export const digits = (lang: Lang, s: string) =>
   lang === 'ar' ? s.replace(/\d/g, (c) => '٠١٢٣٤٥٦٧٨٩'[+c]) : s;

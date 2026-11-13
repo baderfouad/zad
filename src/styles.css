@@ -471,3 +471,12 @@ table.raw tr.bad td { background: color-mix(in srgb, var(--madder) 14%, transpar
 .plan-bar { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: center; }
 .cal-note { font-size: .92rem; color: var(--ink2); display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: center; }
 .cal-note b { color: var(--indigo); }
+
+/* ---------- owner: where the number comes from ---------- */
+.src-steps { list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-direction: column; gap: 0; counter-reset: s; }
+.src-steps li { position: relative; padding: 10px 0; padding-inline-start: 36px; border-bottom: 1px dashed var(--line); font-size: 1.05rem; counter-increment: s; }
+.src-steps li::before { content: counter(s, arabic-indic); position: absolute; inset-inline-start: 0; top: 10px; width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--line); display: flex; align-items: center; justify-content: center; font-size: .8rem; font-weight: 800; color: var(--ink2); }
+:root[lang="en"] .src-steps li::before { content: counter(s); }
+.src-steps li.ev::before { border-color: var(--indigo); color: var(--indigo); }
+.src-steps li.res { border-bottom: 0; font-size: 1.15rem; }
+.src-steps li.res::before { content: '='; border-color: var(--saffron); color: var(--ink); }

@@ -7,21 +7,17 @@ import { Upcoming } from '../components/Upcoming';
 import { KitchenBrief } from '../components/KitchenBrief';
 import { HifzNearest } from '../components/HifzNearest';
 import { leftoverTotals } from '../data/derive';
-import { digits, fill, fmtDate, parseDigits, weekdayName } from '../i18n/format';
+import { fill, fmtDate, weekdayName } from '../i18n/format';
 import { useApp } from '../state/AppState';
 import { href } from '../state/useRoute';
 import { useVenueView } from '../state/useVenueView';
 
-
 export function Owner() {
-  const { t, n, pct, lang, data, scenario, setScenario, log } = useApp();
+  const { t, n, pct, signedPct, lang, data, setScenario, log } = useApp();
   const v = useVenueView();
   if (!v || !data) return <div className="wrap state">{t.noData}</div>;
 
   const diff = v.usualKg - v.totalKg;
-  const own = scenario.guests !== null;
-  const setGuests = (g: number) => setScenario({ guests: Math.max(0, Math.min(5000, Math.round(g))) });
-  const occs = data.occasions.map((o) => o.id);
   const left = leftoverTotals(log);
   const s = v.savings;
   const last7 = v.history.slice(-7);
@@ -48,30 +44,23 @@ export function Owner() {
         </section>
 
         <section className="o-block" aria-labelledby="g-h">
-          <h2 id="g-h">{v.isTomorrow ? t.oGH : t.oGHDay}</h2>
-          <p className="hint">{fill(own ? t.oGHintOwn : t.oGHint, { n: n(v.steps.expected) })}</p>
-          <div className="stepper">
-            <button type="button" className="round" aria-label={t.oMinus} onClick={() => setGuests(v.guests - 10)}>−</button>
-            <label>
-              <span className="sr">{t.oGuestsInput}</span>
-              <input type="text" inputMode="numeric" autoComplete="off" value={digits(lang, String(v.guests))}
-                onChange={(e) => { const x = parseDigits(e.target.value); if (Number.isFinite(x)) setGuests(x); else if (e.target.value === '') setGuests(0); }} />
-            </label>
-            <button type="button" className="round" aria-label={t.oPlus} onClick={() => setGuests(v.guests + 10)}>+</button>
-            {own && <button type="button" className="linkbtn" onClick={() => setScenario({ guests: null })}>{t.oReset}</button>}
-          </div>
-          <h2 style={{ marginTop: 18 }} id="occ-h">{v.isTomorrow ? t.oOccH : t.oOccHDay}</h2>
-          <div className="chips" role="group" aria-labelledby="occ-h">
-            {occs.map((o) => (
-              <button key={o} type="button" className="chip" aria-pressed={v.occ.id === o} onClick={() => setScenario({ occasion: o })}>
-                {t.occ[o] ?? o}
-              </button>
-            ))}
-          </div>
-          <p className="cal-note">
-            {v.calEvent ? <span>{fill(t.calFrom, { e: '' })}<b>{lang === 'ar' ? v.calEvent.nameAr : v.calEvent.nameEn}</b></span> : <span>{t.calNoEvent}</span>}
-            {!v.occFromCalendar && <button type="button" className="linkbtn" onClick={() => setScenario({ occasion: null })}>{t.calUse}</button>}
-          </p>
+          <h2 id="g-h">{t.srcH}</h2>
+          <p className="hint">{t.srcS}</p>
+          <ol className="src-steps">
+            <li><Rich s={t.srcHistory} v={{ n: n(v.steps.sameWeekdayDays), d: weekdayName(lang, v.target), g: n(v.steps.typical + v.steps.weekday) }} /></li>
+            {v.isWeekend && <li>{fill(t.srcWeekend, { d: weekdayName(lang, v.target) })}</li>}
+            <li className={v.calEvent ? 'ev' : ''}>
+              {v.calEvent
+                ? <Rich s={t.srcEvent} v={{ e: lang === 'ar' ? v.calEvent.nameAr : v.calEvent.nameEn, p: signedPct((v.occ.guestMultiplier - 1) * 100) }} />
+                : t.calNoEvent}
+            </li>
+            {v.steps.weatherFactor !== 1 && v.temp !== null && (
+              <li>{fill(t.srcWeather, { t: n(v.temp), p: signedPct((v.steps.weatherFactor - 1) * 100, 1) })}</li>
+            )}
+            {v.venue.trend !== 1 && <li>{fill(t.srcTrend, { p: signedPct((v.venue.trend - 1) * 100) })}</li>}
+            <li className="res"><Rich s={t.srcResult} v={{ n: n(v.guests) }} /></li>
+          </ol>
+          <a className="note" href={href('kitchen')}>{t.srcMore}</a>
         </section>
 
         <section className="o-block" aria-labelledby="cal-h">

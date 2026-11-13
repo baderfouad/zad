@@ -3,7 +3,7 @@ import { loadData, type FileName, type ZadData } from '../data';
 import { latestLeftovers, type LeftoverEntry } from '../data/derive';
 import { ar, type Dict } from '../i18n/ar';
 import { en } from '../i18n/en';
-import { fmtNum, fmtPct, fmtSigned, type Lang } from '../i18n/format';
+import { fmtNum, fmtPct, fmtSigned, fmtSignedPct, type Lang } from '../i18n/format';
 import type { Scenario } from '../forecast';
 
 type Theme = 'light' | 'dark';
@@ -27,6 +27,7 @@ interface AppCtx {
   n: (x: number, d?: number) => string;
   pct: (x: number, d?: number) => string;
   signed: (x: number, d?: number) => string;
+  signedPct: (pctValue: number, d?: number) => string;
   data: ZadData | null; error: string | null;
   reload: (uploads?: Partial<Record<FileName, string>>) => Promise<void>;
   scenario: Scenario; setScenario: (p: Partial<Scenario>) => void;
@@ -49,7 +50,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [venuePref, setVenuePref] = useState<string>(() => store.get('zad-venue') ?? '');
   const [data, setData] = useState<ZadData | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [scenarios, setScenarios] = useState<Record<string, Scenario>>(() => session.get('zad-scenarios-2', {}));
+  const [scenarios, setScenarios] = useState<Record<string, Scenario>>(() => session.get('zad-scenarios-3', {}));
   const [logs, setLogs] = useState<Record<string, LeftoverEntry[]>>(() => session.get('zad-logs', {}));
   const [donations, setDonations] = useState<Record<string, Donation | null>>(() => session.get('zad-donations', {}));
 
@@ -67,7 +68,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     document.documentElement.dataset.theme = theme;
     document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'dark' ? '#1E1611' : '#ECE3D1');
   }, [theme]);
-  useEffect(() => session.set('zad-scenarios-2', scenarios), [scenarios]);
+  useEffect(() => session.set('zad-scenarios-3', scenarios), [scenarios]);
   useEffect(() => session.set('zad-logs', logs), [logs]);
   useEffect(() => session.set('zad-donations', donations), [donations]);
 
@@ -91,6 +92,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       n: (x, d = 0) => fmtNum(lang, x, d),
       pct: (x, d = 0) => fmtPct(lang, x, d),
       signed: (x, d = 0) => fmtSigned(lang, x, d),
+      signedPct: (x, d = 0) => fmtSignedPct(lang, x, d),
       scenario: scenarios[venueId] ?? DEFAULT_SCENARIO,
       setScenario: (p) => setScenarios((s) => ({ ...s, [venueId]: { ...(s[venueId] ?? DEFAULT_SCENARIO), ...p } })),
       setLogEntry: (dishId, p) => setLogs((s) => ({ ...s, [venueId]: log.map((e) => (e.dishId === dishId ? { ...e, ...p } : e)) })),
