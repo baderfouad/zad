@@ -3,6 +3,7 @@ import { DonateButton } from '../components/Donate';
 import { Plate } from '../components/Plate';
 import { Rich } from '../components/Rich';
 import { Week } from '../components/Week';
+import { Upcoming } from '../components/Upcoming';
 import { KitchenBrief } from '../components/KitchenBrief';
 import { HifzNearest } from '../components/HifzNearest';
 import { leftoverTotals } from '../data/derive';
@@ -34,7 +35,10 @@ export function Owner() {
         </div>
 
         <section className="o-answer" aria-live="polite" aria-atomic="true">
-          <p className="when">{fill(t.oWhen, { d: fmtDate(lang, v.tomorrow, { weekday: 'long', day: 'numeric', month: 'long' }) })}</p>
+          <p className="when plan-bar">
+            <span>{fill(v.isTomorrow ? t.oWhen : t.planFor, { d: fmtDate(lang, v.target, { weekday: 'long', day: 'numeric', month: 'long' }) })}</span>
+            {!v.isTomorrow && <button type="button" className="linkbtn" onClick={() => setScenario({ target: null, occasion: null, guests: null })}>{t.backTomorrow}</button>}
+          </p>
           <h1>{t.oCook}</h1>
           <p className="big num">{n(v.totalKg)}<small>{t.kgLong}</small></p>
           <p className="for"><Rich s={t.oGuestsLine} v={{ n: n(v.guests) }} />{v.occ.id !== 'none' && <> · {t.occ[v.occ.id] ?? v.occ.id}</>}</p>
@@ -44,7 +48,7 @@ export function Owner() {
         </section>
 
         <section className="o-block" aria-labelledby="g-h">
-          <h2 id="g-h">{t.oGH}</h2>
+          <h2 id="g-h">{v.isTomorrow ? t.oGH : t.oGHDay}</h2>
           <p className="hint">{fill(own ? t.oGHintOwn : t.oGHint, { n: n(v.steps.expected) })}</p>
           <div className="stepper">
             <button type="button" className="round" aria-label={t.oMinus} onClick={() => setGuests(v.guests - 10)}>−</button>
@@ -56,7 +60,7 @@ export function Owner() {
             <button type="button" className="round" aria-label={t.oPlus} onClick={() => setGuests(v.guests + 10)}>+</button>
             {own && <button type="button" className="linkbtn" onClick={() => setScenario({ guests: null })}>{t.oReset}</button>}
           </div>
-          <h2 style={{ marginTop: 18 }} id="occ-h">{t.oOccH}</h2>
+          <h2 style={{ marginTop: 18 }} id="occ-h">{v.isTomorrow ? t.oOccH : t.oOccHDay}</h2>
           <div className="chips" role="group" aria-labelledby="occ-h">
             {occs.map((o) => (
               <button key={o} type="button" className="chip" aria-pressed={v.occ.id === o} onClick={() => setScenario({ occasion: o })}>
@@ -64,6 +68,16 @@ export function Owner() {
               </button>
             ))}
           </div>
+          <p className="cal-note">
+            {v.calEvent ? <span>{fill(t.calFrom, { e: '' })}<b>{lang === 'ar' ? v.calEvent.nameAr : v.calEvent.nameEn}</b></span> : <span>{t.calNoEvent}</span>}
+            {!v.occFromCalendar && <button type="button" className="linkbtn" onClick={() => setScenario({ occasion: null })}>{t.calUse}</button>}
+          </p>
+        </section>
+
+        <section className="o-block" aria-labelledby="cal-h">
+          <h2 id="cal-h">{t.calH}</h2>
+          <p className="hint">{t.calS}</p>
+          <Upcoming v={v} />
         </section>
 
         <section className="o-block" aria-labelledby="w-h">

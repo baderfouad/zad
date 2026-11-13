@@ -54,6 +54,7 @@ Every number on screen is computed from the CSV files in `public/data/`. Nothing
    | Leftovers today | `leftovers.csv` |
    | Settings | `settings.csv` |
    | Hifz locations | `hifz_locations.csv` |
+   | Qatar calendar | `calendar.csv` |
 
 3. Put them in `data/` and run `npm run sync-data` (or copy them straight into `public/data/`).
 4. Reload the page. With `npm run dev` the change shows at once; on the live site, push and wait for the deploy.
@@ -66,6 +67,7 @@ Things to know:
 - `history.csv` may have an optional `occasion` column (e.g. `national`). When it has some, the learned model also learns the occasion effect.
 - A new venue only needs rows in `venues.csv`, `dishes.csv`, `history.csv` and `weekday.csv`. It then appears in the venue switch.
 - `settings.csv` holds values the prototype used to hard-code: waste-source shares, the share of leftovers donated, tomorrow's temperature, the pickup time, and the Hifz Al Naama link (blank until a verified URL is added).
+- `calendar.csv` is Qatar's calendar: one row per event (`date_from`, `date_to`, `occasion` from `occasions.csv`, names, `confirmed`). Zad applies the occasion automatically on those days, in the week view and when you plan a day. Islamic dates (Ramadan, both Eids) are expected dates marked `confirmed = no`: update them when Qatar's Crescent Sighting Committee announces them, and add next year's rows each year. Qatar's weekend (Friday and Saturday) is `weekend_days` in `settings.csv`; its effect on guests is learned from `history.csv`.
 - `hifz_locations.csv` lists Hifz Al Naama locations for the "Contact the nearest location" map (Owner and Kitchen pages). `kind` is `pickup` (can be chosen as the nearest) or `office` (listed only). `maps_query` is what the Google Maps button searches for. `lat`/`lon` place the pin; venues need `lat`/`lon` in `venues.csv` too. Verify every row by phone: the current rows come from news articles and guides, and their pins are approximate to the area.
 - To try a file without changing anything, use **Upload a CSV** on the Data page. It lasts until you close the tab.
 

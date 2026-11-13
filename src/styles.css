@@ -258,6 +258,7 @@ b.up { color: var(--madder); }
 .fld input, .fld select { height: 44px; border: 1px solid var(--line); background: var(--card); border-radius: 8px; padding-inline: 10px; font-weight: 700; font-size: 1rem; color: var(--ink); }
 .fld input { width: 110px; }
 .fld.temp input { width: 90px; }
+.fld input[type="date"] { width: 160px; }
 .bi { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
 .tl { position: relative; background: var(--card); border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
 .tl.span2 { grid-column: span 2; }
@@ -445,3 +446,28 @@ table.raw tr.bad td { background: color-mix(in srgb, var(--madder) 14%, transpar
 .brief-actions { display: flex; flex-wrap: wrap; gap: 10px; }
 .brief details summary { cursor: pointer; font-weight: 700; min-height: 48px; display: flex; align-items: center; text-decoration: underline; text-underline-offset: 4px; }
 .brief-text { white-space: pre-wrap; font-family: var(--f-body); font-size: .92rem; background: var(--field); border: 1px dashed var(--line); border-radius: 10px; padding: 12px 14px; margin: 0; user-select: all; }
+
+/* ---------- Qatar calendar ---------- */
+.week .col.we .barbox { background: color-mix(in srgb, var(--line) 45%, transparent); border-radius: 4px 4px 0 0; }
+.week .col.ev .bar { background: var(--indigo); }
+.week .col.ev.tm .bar { background: var(--saffron); box-shadow: inset 0 4px 0 var(--indigo); }
+.week .dnum { display: block; font-size: .68rem; color: var(--ink2); font-weight: 400; }
+.legend i.we-sw { background: color-mix(in srgb, var(--line) 45%, transparent); border: 1px solid var(--line); }
+.legend i.ev-sw { background: var(--indigo); }
+.week-legend { margin-top: 6px; }
+.cal { list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-direction: column; }
+.cal li { display: grid; grid-template-columns: 130px minmax(0, 1fr) auto; gap: 6px 16px; align-items: center; padding: 12px 0; border-bottom: 1px dashed var(--line); }
+.cal li:last-child { border-bottom: 0; }
+.cal li.on { background: color-mix(in srgb, var(--saffron) 12%, transparent); border-radius: 8px; padding-inline: 8px; }
+.cal-when { display: flex; flex-direction: column; font-size: .88rem; color: var(--ink2); }
+.cal-when b { color: var(--ink); font-size: 1rem; }
+.cal-what h3 { font-size: 1.1rem; }
+.cal-what p { display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: center; margin-top: 2px; }
+.cal .btn { padding: 8px 14px; min-height: 44px; font-size: .9rem; }
+.cal .btn[aria-pressed="true"] { border-color: var(--saffron); }
+@media (max-width: 620px) { .cal li { grid-template-columns: minmax(0, 1fr); } .cal .btn { justify-self: start; } }
+.cal.compact li { grid-template-columns: 120px minmax(0, 1fr) auto; }
+@media (max-width: 620px) { .cal.compact li { grid-template-columns: minmax(0, 1fr); } }
+.plan-bar { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: center; }
+.cal-note { font-size: .92rem; color: var(--ink2); display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: center; }
+.cal-note b { color: var(--indigo); }

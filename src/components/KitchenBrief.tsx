@@ -18,12 +18,12 @@ export function KitchenBrief({ v }: { v: VenueView }) {
     if (Math.abs(d) < 0.5) return t.briefSame;
     return fill(d > 0 ? t.briefLess : t.briefMore, { d: n(Math.abs(d)) });
   };
-  const date = fmtDate(lang, v.tomorrow, { weekday: 'long', day: 'numeric', month: 'long' });
+  const date = fmtDate(lang, v.target, { weekday: 'long', day: 'numeric', month: 'long' });
   const vname = lang === 'ar' ? v.venue.nameAr : v.venue.nameEn;
   const sep = lang === 'ar' ? '، ' : ', ';
 
   const message = [
-    fill(t.briefMsgTitle, { d: date }),
+    v.isTomorrow ? fill(t.briefMsgTitle, { d: date }) : fill(t.planFor, { d: date }),
     vname,
     fill(t.briefMsgGuests, { n: n(v.guests) }) + (v.occ.id !== 'none' ? ` · ${t.occ[v.occ.id] ?? v.occ.id}` : ''),
     fill(t.briefMsgTotal, { kg: n(v.totalKg), diff: diffText(v.usualKg, v.totalKg) }),

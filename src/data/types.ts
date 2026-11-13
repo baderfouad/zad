@@ -84,8 +84,19 @@ export interface HifzLocation {
   source: string;
 }
 
-export type FileName = 'venues' | 'dishes' | 'history' | 'weekday' | 'occasions' | 'leftovers' | 'settings' | 'hifz_locations';
-export const FILES: FileName[] = ['venues', 'dishes', 'history', 'weekday', 'occasions', 'leftovers', 'settings', 'hifz_locations'];
+/** A day or range in Qatar's calendar that changes how many guests come. */
+export interface CalendarEvent {
+  from: string; // YYYY-MM-DD
+  to: string;   // inclusive
+  occasion: string; // an id from occasions.csv
+  nameEn: string;
+  nameAr: string;
+  confirmed: boolean; // false = expected date (moon sighting)
+  source: string;
+}
+
+export type FileName = 'venues' | 'dishes' | 'history' | 'weekday' | 'occasions' | 'leftovers' | 'settings' | 'hifz_locations' | 'calendar';
+export const FILES: FileName[] = ['venues', 'dishes', 'history', 'weekday', 'occasions', 'leftovers', 'settings', 'hifz_locations', 'calendar'];
 
 export interface DataWarning {
   file: FileName;
@@ -106,6 +117,7 @@ export interface ZadData {
   occasions: Occasion[];
   leftovers: Leftover[];
   hifz: HifzLocation[];
+  calendar: CalendarEvent[];
   settings: Setting[];
   warnings: DataWarning[];
   raw: Record<FileName, RawTable>;

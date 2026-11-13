@@ -13,6 +13,7 @@ export const REQUIRED_COLUMNS: Record<FileName, string[]> = {
   leftovers: ['date', 'venue_id', 'dish_id', 'left_kg', 'held_safely'],
   settings: ['setting', 'venue_id', 'value'],
   hifz_locations: ['location_id', 'name_en', 'name_ar', 'lat', 'lon', 'phone'],
+  calendar: ['date_from', 'date_to', 'occasion', 'name_en', 'name_ar'],
 };
 
 const WEEKDAYS = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
@@ -32,7 +33,7 @@ export function parseCsv(text: string): RawTable {
 /** Which file a CSV is, judged by its headers. Used for uploads. */
 export function detectFile(headers: string[]): FileName | null {
   const set = new Set(headers);
-  const order: FileName[] = ['history', 'dishes', 'leftovers', 'occasions', 'hifz_locations', 'venues', 'settings', 'weekday'];
+  const order: FileName[] = ['history', 'dishes', 'leftovers', 'calendar', 'occasions', 'hifz_locations', 'venues', 'settings', 'weekday'];
   return order.find((f) => REQUIRED_COLUMNS[f].every((c) => set.has(c))) ?? null;
 }
 
@@ -224,13 +225,28 @@ export function buildData(raw: Record<FileName, RawTable>, overridden: FileName[
     };
   }) : [];
 
+  const occIds = new Set(occasions.map((o) => o.id));
+  const calendar = raw.calendar ? eachRow('calendar', raw.calendar, warnings, (r) => {
+    const from = isoDate(r.date_from, 'date_from');
+    const to = optStr(r.date_to) ? isoDate(r.date_to, 'date_to') : from;
+    if (to < from) throw new RowError(`date_to (${to}) is before date_from (${from})`);
+    const occasion = str(r.occasion, 'occasion').toLowerCase();
+    if (!occIds.has(occasion)) throw new RowError(`occasion "${occasion}" is not in occasions.csv`);
+    return {
+      from, to, occasion,
+      nameEn: str(r.name_en, 'name_en'), nameAr: str(r.name_ar, 'name_ar'),
+      confirmed: optStr(r.confirmed) === '' ? true : bool(r.confirmed, 'confirmed'),
+      source: optStr(r.source),
+    };
+  }).sort((a, b) => a.from.localeCompare(b.from)) : [];
+
   for (const v of venues) {
     const n = history.filter((h) => h.venueId === v.id).length;
     if (n < 14) warnings.push({ file: 'history', row: 1, message: `${v.id} has only ${n} days of history. Zad needs at least 14 to learn from.` });
     if (!dishes.some((d) => d.venueId === v.id)) warnings.push({ file: 'dishes', row: 1, message: `${v.id} has no dishes.` });
   }
 
-  return { venues, dishes, history, weekday, occasions, leftovers, settings, hifz, warnings, raw, overridden };
+  return { venues, dishes, history, weekday, occasions, leftovers, settings, hifz, calendar, warnings, raw, overridden };
 }
 
 /** A setting for a venue, falling back to the "all" row. */

@@ -37,7 +37,7 @@ interface AppCtx {
 
 const Ctx = createContext<AppCtx | null>(null);
 
-const DEFAULT_SCENARIO: Scenario = { occasion: 'none', guests: null, tempC: null };
+const DEFAULT_SCENARIO: Scenario = { occasion: null, guests: null, tempC: null, target: null };
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const [lang, setLangS] = useState<Lang>(() => (store.get('zad-lang') === 'en' ? 'en' : 'ar'));
@@ -49,7 +49,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [venuePref, setVenuePref] = useState<string>(() => store.get('zad-venue') ?? '');
   const [data, setData] = useState<ZadData | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [scenarios, setScenarios] = useState<Record<string, Scenario>>(() => session.get('zad-scenarios', {}));
+  const [scenarios, setScenarios] = useState<Record<string, Scenario>>(() => session.get('zad-scenarios-2', {}));
   const [logs, setLogs] = useState<Record<string, LeftoverEntry[]>>(() => session.get('zad-logs', {}));
   const [donations, setDonations] = useState<Record<string, Donation | null>>(() => session.get('zad-donations', {}));
 
@@ -67,7 +67,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     document.documentElement.dataset.theme = theme;
     document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'dark' ? '#1E1611' : '#ECE3D1');
   }, [theme]);
-  useEffect(() => session.set('zad-scenarios', scenarios), [scenarios]);
+  useEffect(() => session.set('zad-scenarios-2', scenarios), [scenarios]);
   useEffect(() => session.set('zad-logs', logs), [logs]);
   useEffect(() => session.set('zad-donations', donations), [donations]);
 

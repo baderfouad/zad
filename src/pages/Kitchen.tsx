@@ -3,6 +3,7 @@ import { Donut, LineChart, WasteChart } from '../components/charts';
 import { DonateButton } from '../components/Donate';
 import { DemoFlag } from '../components/Layout';
 import { Week } from '../components/Week';
+import { Upcoming } from '../components/Upcoming';
 import { HifzNearest } from '../components/HifzNearest';
 import { leftoverTotals } from '../data/derive';
 import { FEATURES, type VenueView } from '../forecast';
@@ -21,20 +22,25 @@ export function Kitchen() {
       <div className="k-head">
         <div>
           <h1>{fill(t.kTitle, { v: vname })}</h1>
-          <p className="for">{fill(t.kFor, { d: fmtDate(lang, v.tomorrow, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) })}</p>
+          <p className="for">{fill(t.kFor, { d: fmtDate(lang, v.target, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) })}</p>
           <DemoFlag />
         </div>
         <form className="scen" onSubmit={(e) => e.preventDefault()}>
+          <label className="fld">
+            <span>{t.kDay}</span>
+            <input type="date" min={v.tomorrow} value={v.target} onChange={(e) => setScenario({ target: e.target.value || null, guests: null })} />
+          </label>
           <NumField label={t.kGuests} value={v.guests} onChange={(x) => setScenario({ guests: x === null ? null : Math.max(0, Math.min(5000, Math.round(x))) })} />
           <label className="fld">
             <span>{t.kOcc}</span>
-            <select value={v.occ.id} onChange={(e) => setScenario({ occasion: e.target.value })}>
+            <select value={scenario.occasion ?? ''} onChange={(e) => setScenario({ occasion: e.target.value || null })}>
+              <option value="">{t.calAuto} · {t.occ[v.occ.id] ?? v.occ.id}</option>
               {data.occasions.map((o) => <option key={o.id} value={o.id}>{t.occ[o.id] ?? o.id}</option>)}
             </select>
           </label>
           <NumField label={t.kTemp} value={v.temp} className="temp" onChange={(x) => setScenario({ tempC: x })} />
-          {(scenario.guests !== null || scenario.tempC !== null) && (
-            <button type="button" className="linkbtn" onClick={() => setScenario({ guests: null, tempC: null })}>{t.kReset}</button>
+          {(scenario.guests !== null || scenario.tempC !== null || scenario.occasion !== null || !v.isTomorrow) && (
+            <button type="button" className="linkbtn" onClick={() => setScenario({ guests: null, tempC: null, occasion: null, target: null })}>{t.kReset}</button>
           )}
         </form>
       </div>
@@ -54,6 +60,11 @@ export function Kitchen() {
         <LeftTile />
         <WhyPanel v={v} />
         <MlPanel v={v} />
+        <section className="tl span4" aria-labelledby="cal-h">
+          <h2 id="cal-h">{t.calH}</h2>
+          <p className="sub">{t.calS}</p>
+          <Upcoming v={v} compact />
+        </section>
         <PrepSheet v={v} />
         <LeftoverLog v={v} />
         <section className="tl span4" aria-labelledby="near-h">
@@ -263,8 +274,8 @@ function WhyPanel({ v }: { v: VenueView }) {
   const { t, n, signed, lang, scenario } = useApp();
   const s = v.steps;
   const steps = [
-    { k: 'weekday', label: fill(t.why.weekday, { d: weekdayName(lang, v.tomorrow) }), d: s.weekday },
-    { k: 'occasion', label: `${t.why.occasion} · ${t.occ[v.occ.id] ?? v.occ.id}`, d: s.occasion },
+    { k: 'weekday', label: fill(t.why.weekday, { d: v.isWeekend ? fill(t.whyWeekend, { d: weekdayName(lang, v.target) }) : weekdayName(lang, v.target) }), d: s.weekday },
+    { k: 'occasion', label: `${t.why.occasion} · ${v.occFromCalendar && v.calEvent ? (lang === 'ar' ? v.calEvent.nameAr : v.calEvent.nameEn) : t.occ[v.occ.id] ?? v.occ.id}`, d: s.occasion },
     { k: 'weather', label: `${t.why.weather} · ${v.temp === null ? '—' : n(v.temp) + t.celsius}`, d: s.weather },
     { k: 'trend', label: `${t.why.trend} ×${n(v.venue.trend, 2)}`, d: s.trend },
   ];

@@ -92,6 +92,17 @@ describe('derived numbers', () => {
   });
 });
 
+describe('calendar.csv', () => {
+  it('loads and validates events', () => {
+    const d = loadFixture();
+    expect(d.calendar.length).toBeGreaterThan(3);
+    expect(d.calendar.find((e) => e.nameEn === 'Ramadan')!.confirmed).toBe(false);
+    const bad = loadFixture({ calendar: 'date_from,date_to,occasion,name_en,name_ar\n2027-01-05,2027-01-01,eid,X,س\n2027-01-05,,party,Y,ص\n' });
+    expect(bad.calendar).toEqual([]);
+    expect(bad.warnings.map((w) => w.message)).toEqual([expect.stringContaining('before'), expect.stringContaining('not in occasions.csv')]);
+  });
+});
+
 describe('Hifz Al Naama locations', () => {
   const d = loadFixture();
   it('loads locations and venue coordinates', () => {

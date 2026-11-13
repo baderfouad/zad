@@ -16,7 +16,7 @@ export function Ticket({ v }: { v: VenueView }) {
           <span>
             {lang === 'ar' ? v.venue.nameAr : v.venue.nameEn}
             <br />
-            {fmtDate(lang, v.tomorrow, { weekday: 'long', day: 'numeric', month: 'long' })} · {fill(t.tkGuests, { n: n(v.guests) })}
+            {fmtDate(lang, v.target, { weekday: 'long', day: 'numeric', month: 'long' })} · {fill(t.tkGuests, { n: n(v.guests) })}
           </span>
         </div>
         <ul className="tk-lines">

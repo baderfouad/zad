@@ -9,3 +9,4 @@ donated_share,all,38,% of leftover food that was safe and given to Hifz Al Naama
 temp_tomorrow_c,all,29,Expected temperature tomorrow in °C (affects restaurants only)
 pickup_by,all,22:30,Latest pickup time for a donation (24-hour clock)
 hifz_url,all,,TODO(source): official Hifz Al Naama website. Leave blank to hide the link.
+weekend_days,all,Friday;Saturday,Qatar's weekend. Shown in the week view; its effect is learned from history.csv

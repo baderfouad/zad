@@ -60,16 +60,33 @@ export function explainGuests(
   };
 }
 
-export interface WeekDay { date: string; guests: number; lo: number; hi: number; isTomorrow: boolean }
+export interface WeekDay {
+  date: string; guests: number; lo: number; hi: number;
+  isTomorrow: boolean;   // the real tomorrow
+  isFirst: boolean;      // the day being planned (tomorrow unless the owner picked a date)
+  occasion: string;      // occasion id applied that day ('none' if none)
+  weekend: boolean;
+}
 
-/** Expected guests for the 7 days after `today`. Tomorrow uses the full step chain; later days use weekday × trend. */
+/**
+ * Expected guests for 7 days starting at `start`. The first day uses the full step chain (it may carry the owner's
+ * own choices); later days apply Qatar's calendar automatically through `occFor`.
+ */
 export function weekAhead(
-  venue: Venue, history: DayRecord[], today: string, tomorrow: GuestSteps, uncertainty: number,
+  venue: Venue, history: DayRecord[], today: string, start: string, first: GuestSteps, uncertainty: number,
+  occFor: (date: string) => Occasion, weekend: number[], firstOccasion: string,
 ): WeekDay[] {
-  const none: Occasion = { id: 'none', guestMultiplier: 1, appetiteMultiplier: 1, usualOverprep: 1, dishAdjustments: {} };
+  const tomorrow = addDays(today, 1);
   return Array.from({ length: 7 }, (_, i) => {
-    const date = addDays(today, i + 1);
-    const g = i === 0 ? tomorrow.expected : explainGuests(venue, history, today, date, none, null).expected;
-    return { date, guests: g, lo: Math.round(g * (1 - uncertainty)), hi: Math.round(g * (1 + uncertainty)), isTomorrow: i === 0 };
+    const date = addDays(start, i);
+    const occ = occFor(date);
+    const g = i === 0 ? first.expected : explainGuests(venue, history, today, date, occ, null).expected;
+    const u = i === 0 ? uncertainty : uncertainty + (occ.id !== 'none' ? 0.05 : 0);
+    return {
+      date, guests: g, lo: Math.round(g * (1 - u)), hi: Math.round(g * (1 + u)),
+      isTomorrow: date === tomorrow, isFirst: i === 0,
+      occasion: i === 0 ? firstOccasion : occ.id,
+      weekend: weekend.includes(weekdayOfIso(date)),
+    };
   });
 }
