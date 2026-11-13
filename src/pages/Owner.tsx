@@ -3,15 +3,14 @@ import { DonateButton } from '../components/Donate';
 import { Plate } from '../components/Plate';
 import { Rich } from '../components/Rich';
 import { Week } from '../components/Week';
+import { KitchenBrief } from '../components/KitchenBrief';
 import { HifzNearest } from '../components/HifzNearest';
 import { leftoverTotals } from '../data/derive';
-import type { DishPlan } from '../forecast';
 import { digits, fill, fmtDate, parseDigits, weekdayName } from '../i18n/format';
 import { useApp } from '../state/AppState';
 import { href } from '../state/useRoute';
 import { useVenueView } from '../state/useVenueView';
 
-const SERVICE_ORDER = ['Breakfast', 'Lunch', 'Dinner', 'All day'];
 
 export function Owner() {
   const { t, n, pct, lang, data, scenario, setScenario, log } = useApp();
@@ -22,8 +21,6 @@ export function Owner() {
   const own = scenario.guests !== null;
   const setGuests = (g: number) => setScenario({ guests: Math.max(0, Math.min(5000, Math.round(g))) });
   const occs = data.occasions.map((o) => o.id);
-  const name = (p: DishPlan) => (lang === 'ar' ? p.dish.nameAr : p.dish.nameEn);
-  const dishes = [...v.plan].sort((a, b) => SERVICE_ORDER.indexOf(a.dish.service) - SERVICE_ORDER.indexOf(b.dish.service) || b.fcKg - a.fcKg);
   const left = leftoverTotals(log);
   const s = v.savings;
   const last7 = v.history.slice(-7);
@@ -77,22 +74,7 @@ export function Owner() {
 
         <section className="o-block" aria-labelledby="tell-h">
           <h2 id="tell-h">{t.oTellH}</h2>
-          <ul className="tell">
-            {dishes.map((p) => {
-              const d = p.usualKg - p.fcKg;
-              return (
-                <li key={p.dish.id}>
-                  <span className="d">{name(p)}</span>
-                  <span className="q num">{n(p.fcKg, 1)} <small>{t.kg}</small></span>
-                  <span className="was">
-                    {t.service[p.dish.service]} ·{' '}
-                    {Math.abs(d) < 0.5 ? t.oWasSame
-                      : <Rich s={d > 0 ? t.oWasDown : t.oWasUp} v={{ kg: n(p.usualKg, 1), d: `${n(Math.abs(d), 1)} ${t.kg}` }} />}
-                  </span>
-                </li>
-              );
-            })}
-          </ul>
+          <KitchenBrief v={v} />
         </section>
 
         {s.daysWithZad > 0 && s.daysBefore > 0 && (

@@ -48,3 +48,35 @@ export function planDishes(venue: Venue, dishes: Dish[], guests: number, occ: Oc
 }
 
 export const sum = (xs: number[]) => xs.reduce((a, b) => a + b, 0);
+
+export interface BriefGroup {
+  key: 'Breakfast' | 'Lunch' | 'Dinner' | 'All day';
+  kg: number;
+  usualKg: number;
+  dishes: { plan: DishPlan; kg: number }[]; // biggest first
+}
+
+/**
+ * Groups tomorrow's plan into meals for the owner's short kitchen brief.
+ * Buffets group by each dish's service. Restaurants split every dish 45% lunch / 55% dinner (the cooking plan).
+ */
+export function briefGroups(plan: DishPlan[], kind: Venue['kind']): BriefGroup[] {
+  const order: BriefGroup['key'][] = ['Breakfast', 'Lunch', 'Dinner', 'All day'];
+  const groups = new Map<BriefGroup['key'], BriefGroup>();
+  const add = (key: BriefGroup['key'], p: DishPlan, share: number) => {
+    const g = groups.get(key) ?? { key, kg: 0, usualKg: 0, dishes: [] };
+    g.kg += p.fcKg * share; g.usualKg += p.usualKg * share;
+    g.dishes.push({ plan: p, kg: p.fcKg * share });
+    groups.set(key, g);
+  };
+  for (const p of plan) {
+    if (kind === 'alacarte' && p.dish.service === 'All day') {
+      for (const b of p.batches) add(b.when === 'lunch' ? 'Lunch' : 'Dinner', p, b.share);
+    } else add(p.dish.service, p, 1);
+  }
+  return order.filter((k) => groups.has(k)).map((k) => {
+    const g = groups.get(k)!;
+    g.dishes.sort((a, b) => b.kg - a.kg);
+    return g;
+  });
+}

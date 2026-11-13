@@ -423,3 +423,25 @@ table.raw tr.bad td { background: color-mix(in srgb, var(--madder) 14%, transpar
 .near-list small { color: var(--ink2); }
 .pin-dot { width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--palm); display: inline-flex; align-items: center; justify-content: center; font-weight: 800; font-size: .8rem; }
 .near-list li:first-child .pin-dot { background: var(--palm); color: var(--on-palm); }
+
+/* ---------- owner's kitchen brief ---------- */
+.brief { display: flex; flex-direction: column; gap: 14px; }
+.brief-line { font-size: 1.15rem; line-height: 1.7; }
+.brief-line b { font-family: var(--f-kufi); font-size: 1.3em; }
+.pill { display: inline-block; padding: 2px 12px; border-radius: 999px; font-size: .9rem; font-weight: 800; border: 2px solid var(--line); white-space: nowrap; }
+.pill.good { border-color: var(--palm); color: var(--palm); }
+.pill.bad { border-color: var(--madder); color: var(--madder); }
+.meals { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
+.meal { background: var(--field); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.meal-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.meal-head h3 { font-size: 1.15rem; }
+.meal-kg { font-family: var(--f-kufi); font-size: 2.1rem; font-weight: 700; line-height: 1; }
+.meal-kg small { font-size: .45em; margin-inline-start: 4px; color: var(--ink2); }
+.meal-diff { font-size: .88rem; font-weight: 700; color: var(--ink2); }
+.meal-diff.good { color: var(--palm); }
+.meal-diff.bad { color: var(--madder); }
+.meal-dishes { font-size: .92rem; color: var(--ink2); }
+.meal-dishes b { color: var(--ink); }
+.brief-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.brief details summary { cursor: pointer; font-weight: 700; min-height: 48px; display: flex; align-items: center; text-decoration: underline; text-underline-offset: 4px; }
+.brief-text { white-space: pre-wrap; font-family: var(--f-body); font-size: .92rem; background: var(--field); border: 1px dashed var(--line); border-radius: 10px; padding: 12px 14px; margin: 0; user-select: all; }

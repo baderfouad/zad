@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { csv, loadFixture } from '../../test-utils';
-import { addDays, computeVenue, explainGuests, fitLinear, planDishes, solve, weatherFactor } from '..';
+import { addDays, briefGroups, computeVenue, explainGuests, fitLinear, planDishes, solve, weatherFactor } from '..';
 
 describe('linear algebra', () => {
   it('solves a small system', () => {
@@ -88,5 +88,22 @@ describe('whole venue', () => {
   it("uses the owner's own number when given", () => {
     const v = computeVenue(loadFixture(), 'restaurant', { occasion: 'none', guests: 300, tempC: null })!;
     expect(v.guests).toBe(300);
+  });
+});
+
+describe('kitchen brief', () => {
+  it('groups a buffet by meal and keeps the total', () => {
+    const v = computeVenue(loadFixture(), 'hotel', { occasion: 'none', guests: null, tempC: null })!;
+    const g = briefGroups(v.plan, 'buffet');
+    expect(g.map((x) => x.key)).toEqual(['Breakfast', 'Lunch', 'Dinner']);
+    expect(g.reduce((a, x) => a + x.kg, 0)).toBeCloseTo(v.totalKg);
+    expect(g[0].dishes[0].kg).toBeGreaterThanOrEqual(g[0].dishes[1].kg);
+  });
+  it('splits a restaurant 45% lunch / 55% dinner', () => {
+    const v = computeVenue(loadFixture(), 'restaurant', { occasion: 'none', guests: null, tempC: null })!;
+    const g = briefGroups(v.plan, 'alacarte');
+    expect(g.map((x) => x.key)).toEqual(['Lunch', 'Dinner']);
+    expect(g[0].kg).toBeCloseTo(v.totalKg * 0.45);
+    expect(g[1].kg).toBeCloseTo(v.totalKg * 0.55);
   });
 });
