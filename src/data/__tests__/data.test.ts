@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { csv, loadFixture } from '../../test-utils';
 import { detectFile, parseAdjustments, parseCsv } from '../parse';
-import { funnel, latestLeftovers, leftoverTotals, savings, wasteRate, wasteSources, weightedCostPerKg } from '../derive';
+import { byDistance, distanceKm, funnel, latestLeftovers, leftoverTotals, savings, wasteRate, wasteSources, weightedCostPerKg } from '../derive';
 
 describe('parsing', () => {
   it('loads the sample data without warnings', () => {
@@ -89,5 +89,28 @@ describe('derived numbers', () => {
     const t = leftoverTotals(entries);
     expect(t.total).toBeCloseTo(19.8);
     expect(t.safe).toBeCloseTo(19.8 - 1.6);
+  });
+});
+
+describe('Hifz Al Naama locations', () => {
+  const d = loadFixture();
+  it('loads locations and venue coordinates', () => {
+    expect(d.hifz.length).toBeGreaterThan(0);
+    expect(d.hifz[0].phone).toMatch(/^\d{8}$/);
+    expect(d.venues[0].lat).not.toBeNull();
+  });
+  it('measures distance correctly', () => {
+    // Doha (West Bay) to Al Wakrah is about 18 km in a straight line
+    expect(distanceKm({ lat: 25.3215, lon: 51.528 }, { lat: 25.1715, lon: 51.6034 })).toBeCloseTo(18.2, 0);
+    expect(distanceKm({ lat: 25, lon: 51 }, { lat: 25, lon: 51 })).toBe(0);
+  });
+  it('sorts nearest first', () => {
+    const r = byDistance({ lat: 25.17, lon: 51.6 }, [{ lat: 25.35, lon: 51.49, id: 'far' }, { lat: 25.2, lon: 51.6, id: 'near' }]);
+    expect(r.map((x) => x.place.id)).toEqual(['near', 'far']);
+  });
+  it('skips a location without coordinates', () => {
+    const x = loadFixture({ hifz_locations: 'location_id,name_en,name_ar,lat,lon,phone\nx,A,ا,,,44355555\n' });
+    expect(x.hifz).toEqual([]);
+    expect(x.warnings[0]).toMatchObject({ file: 'hifz_locations', row: 2 });
   });
 });

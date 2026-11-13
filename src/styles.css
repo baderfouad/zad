@@ -388,3 +388,38 @@ table.raw tr.bad td { background: color-mix(in srgb, var(--madder) 14%, transpar
   .door:hover { transform: none; }
 }
 @media print { .top, footer, .controls { display: none; } }
+
+/* ---------- nearest Hifz Al Naama ---------- */
+.near { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 18px 24px; align-items: start; margin-top: 6px; }
+.near.compact { grid-template-columns: minmax(0, 360px) minmax(0, 1fr); }
+@media (max-width: 700px) { .near, .near.compact { grid-template-columns: minmax(0, 1fr); } }
+.near-map svg { width: 100%; max-width: 420px; height: auto; display: block; border-radius: 12px; border: 1px solid var(--line); }
+.near-map .sea { fill: color-mix(in srgb, var(--indigo) 22%, var(--wool)); }
+.near-map .land { fill: var(--card); stroke: var(--ink2); stroke-width: 1; }
+.near-map .route { stroke: var(--ink2); stroke-width: 1.2; stroke-dasharray: 3 4; opacity: .55; }
+.near-map .route.best { stroke: var(--palm); stroke-width: 2.4; opacity: 1; }
+.near-map .pin-venue { fill: var(--saffron); stroke: var(--ink); stroke-width: 1.5; }
+.near-map .pin-me { fill: var(--indigo); stroke: var(--card); stroke-width: 2.5; }
+.near-map .pin-hifz { fill: var(--card); stroke: var(--palm); stroke-width: 2.5; }
+.near-map .pin-hifz.best { fill: var(--palm); stroke: var(--card); }
+.near-map .pin-ring { fill: none; stroke: var(--palm); stroke-width: 2; opacity: .45; }
+.near-map .pin-num { font: 800 11px var(--f-body); fill: var(--ink); }
+.near-map .pin-hifz.best + .pin-num { fill: var(--on-palm); }
+.near-map .pin-label { font: 700 11px var(--f-body); fill: var(--ink); paint-order: stroke; stroke: var(--wool); stroke-width: 3px; }
+.near-map .pin-label.small { font-size: 9px; }
+.near-map .ov-bg { fill: color-mix(in srgb, var(--indigo) 22%, var(--wool)); stroke: var(--line); }
+.near-map .ov-box { fill: none; stroke: var(--madder); stroke-width: 1.5; }
+.near-info { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.near-info .near-k { font-weight: 700; color: var(--palm); }
+.near-info h3 { font-size: 1.3rem; }
+.near-info h4 { font-family: var(--f-body); font-size: .95rem; margin: 10px 0 0; }
+.near-area { color: var(--ink2); }
+.near-phone { font-family: var(--f-kufi); font-size: 2rem; font-weight: 700; line-height: 1.1; align-self: flex-start; user-select: all; }
+.near-actions { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; }
+.btn.ghost { background: transparent; color: var(--ink); border: 2px solid var(--line); }
+.btn.ghost:hover { border-color: var(--ink2); }
+.near-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; font-size: .9rem; }
+.near-list li { display: grid; grid-template-columns: 24px 1fr; gap: 8px; align-items: start; }
+.near-list small { color: var(--ink2); }
+.pin-dot { width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--palm); display: inline-flex; align-items: center; justify-content: center; font-weight: 800; font-size: .8rem; }
+.near-list li:first-child .pin-dot { background: var(--palm); color: var(--on-palm); }

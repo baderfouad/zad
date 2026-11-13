@@ -12,6 +12,7 @@ export const REQUIRED_COLUMNS: Record<FileName, string[]> = {
   occasions: ['occasion', 'guest_multiplier', 'appetite_multiplier', 'usual_overprep', 'dish_adjustments'],
   leftovers: ['date', 'venue_id', 'dish_id', 'left_kg', 'held_safely'],
   settings: ['setting', 'venue_id', 'value'],
+  hifz_locations: ['location_id', 'name_en', 'name_ar', 'lat', 'lon', 'phone'],
 };
 
 const WEEKDAYS = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
@@ -31,7 +32,7 @@ export function parseCsv(text: string): RawTable {
 /** Which file a CSV is, judged by its headers. Used for uploads. */
 export function detectFile(headers: string[]): FileName | null {
   const set = new Set(headers);
-  const order: FileName[] = ['history', 'dishes', 'leftovers', 'occasions', 'venues', 'settings', 'weekday'];
+  const order: FileName[] = ['history', 'dishes', 'leftovers', 'occasions', 'hifz_locations', 'venues', 'settings', 'weekday'];
   return order.find((f) => REQUIRED_COLUMNS[f].every((c) => set.has(c))) ?? null;
 }
 
@@ -101,6 +102,12 @@ function eachRow<T>(file: FileName, table: RawTable, warnings: DataWarning[], fn
   return out;
 }
 
+/** Optional lat/lon pair; both or neither. Qatar is roughly 24–27°N, 50–52.5°E. */
+function latLon(r: Record<string, unknown>): { lat: number | null; lon: number | null } {
+  if (optStr(r.lat) === '' && optStr(r.lon) === '') return { lat: null, lon: null };
+  return { lat: num(r.lat, 'lat', { min: 24, max: 27 }), lon: num(r.lon, 'lon', { min: 50, max: 52.5 }) };
+}
+
 export function buildData(raw: Record<FileName, RawTable>, overridden: FileName[] = []): ZadData {
   const warnings: DataWarning[] = [];
 
@@ -114,6 +121,7 @@ export function buildData(raw: Record<FileName, RawTable>, overridden: FileName[
       kind: /hotel|buffet/i.test(type) ? 'buffet' : 'alacarte',
       typicalGuests: num(r.typical_guests, 'typical_guests', { min: 1 }),
       trend: num(r.trend, 'trend', { min: 0.5, max: 1.5 }),
+      ...latLon(r),
     };
   });
   const venueIds = new Set(venues.map((v) => v.id));
@@ -198,13 +206,31 @@ export function buildData(raw: Record<FileName, RawTable>, overridden: FileName[
     value: optStr(r.value),
   }));
 
+  const hifz = raw.hifz_locations ? eachRow('hifz_locations', raw.hifz_locations, warnings, (r) => {
+    const ll = latLon(r);
+    if (ll.lat === null || ll.lon === null) throw new RowError('"lat" and "lon" are needed to show it on the map');
+    const phone = str(r.phone, 'phone').replace(/[^\d+]/g, '');
+    if (phone.replace('+', '').length < 8) throw new RowError(`phone "${optStr(r.phone)}" looks too short`);
+    return {
+      id: str(r.location_id, 'location_id'),
+      nameEn: str(r.name_en, 'name_en'),
+      nameAr: str(r.name_ar, 'name_ar'),
+      areaEn: optStr(r.area_en),
+      areaAr: optStr(r.area_ar),
+      lat: ll.lat, lon: ll.lon, phone,
+      kind: optStr(r.kind).toLowerCase() === 'office' ? 'office' as const : 'pickup' as const,
+      mapsQuery: optStr(r.maps_query) || str(r.name_en, 'name_en'),
+      source: optStr(r.source),
+    };
+  }) : [];
+
   for (const v of venues) {
     const n = history.filter((h) => h.venueId === v.id).length;
     if (n < 14) warnings.push({ file: 'history', row: 1, message: `${v.id} has only ${n} days of history. Zad needs at least 14 to learn from.` });
     if (!dishes.some((d) => d.venueId === v.id)) warnings.push({ file: 'dishes', row: 1, message: `${v.id} has no dishes.` });
   }
 
-  return { venues, dishes, history, weekday, occasions, leftovers, settings, warnings, raw, overridden };
+  return { venues, dishes, history, weekday, occasions, leftovers, settings, hifz, warnings, raw, overridden };
 }
 
 /** A setting for a venue, falling back to the "all" row. */

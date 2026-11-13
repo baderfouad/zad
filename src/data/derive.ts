@@ -96,3 +96,16 @@ export function leftoverTotals(entries: LeftoverEntry[]) {
   const safe = sum(entries.filter((e) => e.heldSafely).map((e) => e.leftKg));
   return { total, safe, meals: safe / MEAL_KG };
 }
+
+/** Straight-line distance in km (haversine). */
+export function distanceKm(a: { lat: number; lon: number }, b: { lat: number; lon: number }): number {
+  const R = 6371, rad = Math.PI / 180;
+  const dLat = (b.lat - a.lat) * rad, dLon = (b.lon - a.lon) * rad;
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(a.lat * rad) * Math.cos(b.lat * rad) * Math.sin(dLon / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(h));
+}
+
+/** Locations sorted nearest first, each with its distance from `from`. */
+export function byDistance<T extends { lat: number; lon: number }>(from: { lat: number; lon: number }, places: T[]) {
+  return places.map((p) => ({ place: p, km: distanceKm(from, p) })).sort((a, b) => a.km - b.km);
+}

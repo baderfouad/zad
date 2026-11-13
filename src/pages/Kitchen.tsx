@@ -3,6 +3,7 @@ import { Donut, LineChart, WasteChart } from '../components/charts';
 import { DonateButton } from '../components/Donate';
 import { DemoFlag } from '../components/Layout';
 import { Week } from '../components/Week';
+import { HifzNearest } from '../components/HifzNearest';
 import { leftoverTotals } from '../data/derive';
 import { FEATURES, type VenueView } from '../forecast';
 import { digits, fill, fmtDate, parseDigits, weekdayName } from '../i18n/format';
@@ -55,6 +56,11 @@ export function Kitchen() {
         <MlPanel v={v} />
         <PrepSheet v={v} />
         <LeftoverLog v={v} />
+        <section className="tl span4" aria-labelledby="near-h">
+          <h2 id="near-h">{t.nearH}</h2>
+          <p className="sub">{t.nearS}</p>
+          <HifzNearest compact />
+        </section>
       </div>
     </div>
   );

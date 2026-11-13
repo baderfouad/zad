@@ -3,6 +3,7 @@ import { DonateButton } from '../components/Donate';
 import { Plate } from '../components/Plate';
 import { Rich } from '../components/Rich';
 import { Week } from '../components/Week';
+import { HifzNearest } from '../components/HifzNearest';
 import { leftoverTotals } from '../data/derive';
 import type { DishPlan } from '../forecast';
 import { digits, fill, fmtDate, parseDigits, weekdayName } from '../i18n/format';
@@ -127,6 +128,12 @@ export function Owner() {
           <p>{left.safe > 0 ? <Rich s={t.oLeftP} v={{ kg: n(left.safe, 1), m: n(left.meals) }} /> : t.oLeftNone}</p>
           <DonateButton />
           <a className="note" href={href('kitchen') + '#log'} onClick={(e) => { e.preventDefault(); location.hash = '#kitchen'; setTimeout(() => document.getElementById('log')?.scrollIntoView(), 50); }}>{t.oLeftEdit}</a>
+        </section>
+
+        <section className="o-block" aria-labelledby="near-h">
+          <h2 id="near-h">{t.nearH}</h2>
+          <p className="hint">{t.nearS}</p>
+          <HifzNearest />
         </section>
       </div>
     </div>

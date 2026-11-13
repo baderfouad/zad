@@ -10,6 +10,9 @@ export interface Venue {
   type: string;
   kind: VenueKind;
   typicalGuests: number;
+  /** optional: where the venue is, for "nearest Hifz Al Naama location" */
+  lat: number | null;
+  lon: number | null;
   trend: number;
 }
 
@@ -66,8 +69,23 @@ export interface Setting {
   value: string;
 }
 
-export type FileName = 'venues' | 'dishes' | 'history' | 'weekday' | 'occasions' | 'leftovers' | 'settings';
-export const FILES: FileName[] = ['venues', 'dishes', 'history', 'weekday', 'occasions', 'leftovers', 'settings'];
+export interface HifzLocation {
+  id: string;
+  nameEn: string;
+  nameAr: string;
+  areaEn: string;
+  areaAr: string;
+  lat: number;
+  lon: number;
+  phone: string;      // digits only, local Qatar number
+  /** pickup = arranges food collection; office = admin office (listed, never chosen as nearest) */
+  kind: 'pickup' | 'office';
+  mapsQuery: string;  // what to search for in Google Maps (finds the real place, not our approximate pin)
+  source: string;
+}
+
+export type FileName = 'venues' | 'dishes' | 'history' | 'weekday' | 'occasions' | 'leftovers' | 'settings' | 'hifz_locations';
+export const FILES: FileName[] = ['venues', 'dishes', 'history', 'weekday', 'occasions', 'leftovers', 'settings', 'hifz_locations'];
 
 export interface DataWarning {
   file: FileName;
@@ -87,6 +105,7 @@ export interface ZadData {
   weekday: WeekdayPrior[];
   occasions: Occasion[];
   leftovers: Leftover[];
+  hifz: HifzLocation[];
   settings: Setting[];
   warnings: DataWarning[];
   raw: Record<FileName, RawTable>;
