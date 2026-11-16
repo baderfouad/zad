@@ -11,6 +11,7 @@ import { fill, fmtDate, weekdayName } from '../i18n/format';
 import { useApp } from '../state/AppState';
 import { href } from '../state/useRoute';
 import { useVenueView } from '../state/useVenueView';
+import { setKitchenTab } from '../state/kitchenTab';
 
 export function Owner() {
   const { t, n, pct, signedPct, lang, data, setScenario, log } = useApp();
@@ -43,38 +44,6 @@ export function Owner() {
           </p>
         </section>
 
-        <section className="o-block" aria-labelledby="g-h">
-          <h2 id="g-h">{t.srcH}</h2>
-          <p className="hint">{t.srcS}</p>
-          <ol className="src-steps">
-            <li><Rich s={t.srcHistory} v={{ n: n(v.steps.sameWeekdayDays), d: weekdayName(lang, v.target), g: n(v.steps.typical + v.steps.weekday) }} /></li>
-            {v.isWeekend && <li>{fill(t.srcWeekend, { d: weekdayName(lang, v.target) })}</li>}
-            <li className={v.calEvent ? 'ev' : ''}>
-              {v.calEvent
-                ? <Rich s={t.srcEvent} v={{ e: lang === 'ar' ? v.calEvent.nameAr : v.calEvent.nameEn, p: signedPct((v.occ.guestMultiplier - 1) * 100) }} />
-                : t.calNoEvent}
-            </li>
-            {v.steps.weatherFactor !== 1 && v.temp !== null && (
-              <li>{fill(t.srcWeather, { t: n(v.temp), p: signedPct((v.steps.weatherFactor - 1) * 100, 1) })}</li>
-            )}
-            {v.venue.trend !== 1 && <li>{fill(t.srcTrend, { p: signedPct((v.venue.trend - 1) * 100) })}</li>}
-            <li className="res"><Rich s={t.srcResult} v={{ n: n(v.guests) }} /></li>
-          </ol>
-          <a className="note" href={href('kitchen')}>{t.srcMore}</a>
-        </section>
-
-        <section className="o-block" aria-labelledby="cal-h">
-          <h2 id="cal-h">{t.calH}</h2>
-          <p className="hint">{t.calS}</p>
-          <Upcoming v={v} />
-        </section>
-
-        <section className="o-block" aria-labelledby="w-h">
-          <h2 id="w-h">{t.weekH}</h2>
-          <p className="hint">{t.weekS}</p>
-          <Week days={v.week} />
-        </section>
-
         <section className="o-block" aria-labelledby="tell-h">
           <h2 id="tell-h">{t.oTellH}</h2>
           <KitchenBrief v={v} />
@@ -94,17 +63,7 @@ export function Owner() {
                 <div className="s">{fill(t.tFoodS, { n: n(s.savedMeals) })}</div>
               </div>
             </div>
-            <p style={{ marginTop: 8 }}><Rich s={t.oCompare} v={{ a: pct(s.rateBefore), b: pct(s.rateWith) }} /></p>
-            <h3 style={{ marginTop: 10, fontSize: '1.05rem' }}>{t.platesH}</h3>
-            <p className="hint">{t.platesS}</p>
-            <div className="plates" dir="ltr">
-              {last7.map((d) => (
-                <figure key={d.date}>
-                  <Plate share={d.wastePct} label={fill(t.plateLabel, { d: weekdayName(lang, d.date), p: pct(d.wastePct) })} />
-                  <figcaption dir="auto">{weekdayName(lang, d.date, 'short')}<br /><b className="num">{pct(d.wastePct)}</b></figcaption>
-                </figure>
-              ))}
-            </div>
+            <p><Rich s={t.oCompare} v={{ a: pct(s.rateBefore), b: pct(s.rateWith) }} /></p>
           </section>
         )}
 
@@ -112,13 +71,69 @@ export function Owner() {
           <h2 id="left-h">{t.oLeftH}</h2>
           <p>{left.safe > 0 ? <Rich s={t.oLeftP} v={{ kg: n(left.safe, 1), m: n(left.meals) }} /> : t.oLeftNone}</p>
           <DonateButton />
-          <a className="note" href={href('kitchen') + '#log'} onClick={(e) => { e.preventDefault(); location.hash = '#kitchen'; setTimeout(() => document.getElementById('log')?.scrollIntoView(), 50); }}>{t.oLeftEdit}</a>
+          <a className="note" href={href('kitchen') + '#log'} onClick={(e) => { e.preventDefault(); setKitchenTab('plan'); location.hash = '#kitchen'; setTimeout(() => document.getElementById('log')?.scrollIntoView(), 50); }}>{t.oLeftEdit}</a>
         </section>
 
-        <section className="o-block" aria-labelledby="near-h">
-          <h2 id="near-h">{t.nearH}</h2>
-          <p className="hint">{t.nearS}</p>
-          <HifzNearest />
+        <section className="o-block more" aria-labelledby="more-h">
+          <h2 id="more-h">{t.moreH}</h2>
+          <details>
+            <summary>{t.srcH}</summary>
+            <div className="fold">
+              <p className="hint">{t.srcS}</p>
+              <ol className="src-steps">
+                <li><Rich s={t.srcHistory} v={{ n: n(v.steps.sameWeekdayDays), d: weekdayName(lang, v.target), g: n(v.steps.typical + v.steps.weekday) }} /></li>
+                {v.isWeekend && <li>{fill(t.srcWeekend, { d: weekdayName(lang, v.target) })}</li>}
+                <li className={v.calEvent ? 'ev' : ''}>
+                  {v.calEvent
+                    ? <Rich s={t.srcEvent} v={{ e: lang === 'ar' ? v.calEvent.nameAr : v.calEvent.nameEn, p: signedPct((v.occ.guestMultiplier - 1) * 100) }} />
+                    : t.calNoEvent}
+                </li>
+                {v.steps.weatherFactor !== 1 && v.temp !== null && (
+                  <li>{fill(t.srcWeather, { t: n(v.temp), p: signedPct((v.steps.weatherFactor - 1) * 100, 1) })}</li>
+                )}
+                {v.venue.trend !== 1 && <li>{fill(t.srcTrend, { p: signedPct((v.venue.trend - 1) * 100) })}</li>}
+                <li className="res"><Rich s={t.srcResult} v={{ n: n(v.guests) }} /></li>
+              </ol>
+              <a className="note" href={href('kitchen')} onClick={() => setKitchenTab('forecast')}>{t.srcMore}</a>
+            </div>
+          </details>
+          <details>
+            <summary>{t.calH}</summary>
+            <div className="fold">
+              <p className="hint">{t.calS}</p>
+              <Upcoming v={v} />
+            </div>
+          </details>
+          <details>
+            <summary>{t.weekH}</summary>
+            <div className="fold">
+              <p className="hint">{t.weekS}</p>
+              <Week days={v.week} />
+            </div>
+          </details>
+          {s.daysWithZad > 0 && (
+            <details>
+              <summary>{t.platesH}</summary>
+              <div className="fold">
+                <p className="hint">{t.platesS}</p>
+                <div className="plates" dir="ltr">
+                  {last7.map((d) => (
+                    <figure key={d.date}>
+                      <Plate share={d.wastePct} label={fill(t.plateLabel, { d: weekdayName(lang, d.date), p: pct(d.wastePct) })} />
+                      <figcaption dir="auto">{weekdayName(lang, d.date, 'short')}<br /><b className="num">{pct(d.wastePct)}</b></figcaption>
+                    </figure>
+                  ))}
+                </div>
+              </div>
+            </details>
+          )}
+          <details>
+            <summary>{t.nearH}</summary>
+            <div className="fold">
+              <p className="hint">{t.nearS}</p>
+              <HifzNearest />
+            </div>
+          </details>
         </section>
       </div>
     </div>

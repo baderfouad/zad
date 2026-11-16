@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Donut, LineChart, WasteChart } from '../components/charts';
 import { DonateButton } from '../components/Donate';
 import { DemoFlag } from '../components/Layout';
@@ -9,13 +9,30 @@ import { leftoverTotals } from '../data/derive';
 import { FEATURES, type VenueView } from '../forecast';
 import { fill, fmtDate, parseDigits, weekdayName } from '../i18n/format';
 import { useApp } from '../state/AppState';
+import { getKitchenTab, KITCHEN_TABS, setKitchenTab, type KitchenTab } from '../state/kitchenTab';
 import { useVenueView } from '../state/useVenueView';
 
 export function Kitchen() {
   const { t, lang, data, setScenario } = useApp();
   const v = useVenueView();
+  const [tab, setTab] = useState<KitchenTab>(getKitchenTab);
+  const tabRefs = useRef<Record<string, HTMLButtonElement | null>>({});
   if (!v || !data) return <div className="wrap state">{t.noData}</div>;
   const vname = lang === 'ar' ? v.venue.nameAr : v.venue.nameEn;
+  const pick = (k: KitchenTab) => { setTab(k); setKitchenTab(k); };
+  function onKey(e: React.KeyboardEvent, i: number) {
+    const sign = document.documentElement.dir === 'rtl' ? -1 : 1;
+    let j = i;
+    if (e.key === 'ArrowRight') j = i + sign;
+    else if (e.key === 'ArrowLeft') j = i - sign;
+    else if (e.key === 'Home') j = 0;
+    else if (e.key === 'End') j = KITCHEN_TABS.length - 1;
+    else return;
+    e.preventDefault();
+    const k = KITCHEN_TABS[(j + KITCHEN_TABS.length) % KITCHEN_TABS.length];
+    pick(k);
+    tabRefs.current[k]?.focus();
+  }
 
   return (
     <div className="wrap kitchen">
@@ -34,65 +51,101 @@ export function Kitchen() {
         </form>
       </div>
 
-      <div className="bi">
-        <Kpis v={v} />
-        <section className="tl span2" aria-labelledby="wk-h">
-          <h2 id="wk-h">{t.weekH}</h2>
-          <p className="sub">{t.weekTileS}</p>
-          <Week days={v.week} />
-        </section>
-        <DishTile v={v} />
-        <FunnelTile v={v} />
-        <SourcesTile v={v} />
-        <WasteTile v={v} />
-        <AccuracyTile v={v} />
-        <LeftTile />
-        <WhyPanel v={v} />
-        <MlPanel v={v} />
-        <section className="tl span4" aria-labelledby="cal-h">
-          <h2 id="cal-h">{t.calH}</h2>
-          <p className="sub">{t.calS}</p>
-          <Upcoming v={v} compact />
-        </section>
-        <PrepSheet v={v} />
-        <LeftoverLog v={v} />
-        <section className="tl span4" aria-labelledby="near-h">
-          <h2 id="near-h">{t.nearH}</h2>
-          <p className="sub">{t.nearS}</p>
-          <HifzNearest compact />
-        </section>
+      <div className="tabs" role="tablist" aria-label={t.kTabsLabel}>
+        {KITCHEN_TABS.map((k, i) => (
+          <button key={k} ref={(el) => { tabRefs.current[k] = el; }} type="button" role="tab" id={`ktab-${k}`} aria-controls="kpanel"
+            aria-selected={tab === k} tabIndex={tab === k ? 0 : -1} onClick={() => pick(k)} onKeyDown={(e) => onKey(e, i)}>
+            {t.kTabs[k]}
+          </button>
+        ))}
+      </div>
+
+      <div className="bi" id="kpanel" role="tabpanel" aria-labelledby={`ktab-${tab}`}>
+        {tab === 'plan' && (
+          <>
+            <GuestsKpi v={v} />
+            <PrepKpi v={v} />
+            <SaveKpi v={v} />
+            <LeftTile />
+            <DishTile v={v} />
+            <LeftoverLog v={v} />
+            <PrepSheet v={v} />
+            <section className="tl span4" aria-labelledby="near-h">
+              <h2 id="near-h">{t.nearH}</h2>
+              <p className="sub">{t.nearS}</p>
+              <HifzNearest compact />
+            </section>
+          </>
+        )}
+        {tab === 'insights' && (
+          <>
+            <WasteKpi v={v} />
+            <SavedKpi v={v} />
+            <FoodKpi v={v} />
+            <PrepDayKpi v={v} />
+            <WasteTile v={v} />
+            <FunnelTile v={v} />
+            <SourcesTile v={v} />
+          </>
+        )}
+        {tab === 'forecast' && (
+          <>
+            <section className="tl span2" aria-labelledby="wk-h">
+              <h2 id="wk-h">{t.weekH}</h2>
+              <p className="sub">{t.weekTileS}</p>
+              <Week days={v.week} />
+            </section>
+            <AccuracyTile v={v} />
+            <WhyPanel v={v} />
+            <MlPanel v={v} />
+            <section className="tl span4" aria-labelledby="cal-h">
+              <h2 id="cal-h">{t.calH}</h2>
+              <p className="sub">{t.calS}</p>
+              <Upcoming v={v} compact />
+            </section>
+          </>
+        )}
       </div>
     </div>
   );
 }
 
-function Kpis({ v }: { v: VenueView }) {
-  const { t, n, pct, signed } = useApp();
-  const d = v.totalKg - v.usualKg;
+function Kpi({ id, label, sub, value, unit, tone = '' }: { id: string; label: string; sub: string; value: string; unit?: string; tone?: '' | 'good' }) {
   return (
-    <>
-      <section className="tl" aria-labelledby="k1">
-        <h2 id="k1">{t.kpiGuests}</h2>
-        <p className="sub">{fill(t.kpiGuestsS, { a: n(v.week[0].lo), b: n(v.week[0].hi) })}</p>
-        <p className="big2 now num">{n(v.guests)}<small>{t.guests}</small></p>
-      </section>
-      <section className="tl" aria-labelledby="k2">
-        <h2 id="k2">{t.kpiPrep}</h2>
-        <p className="sub">{fill(t.kpiPrepS, { d: `${signed(d)} ${t.kg}`, u: n(v.usualKg) })}</p>
-        <p className="big2 bad num">{n(v.totalKg)}<small>{t.kg}</small></p>
-      </section>
-      <section className="tl" aria-labelledby="k3">
-        <h2 id="k3">{t.kpiWaste}</h2>
-        <p className="sub">{fill(t.kpiWasteS, { p: pct(v.savings.rateBefore) })}</p>
-        <p className="big2 good num">{pct(v.rate7)}</p>
-      </section>
-      <section className="tl" aria-labelledby="k4">
-        <h2 id="k4">{t.kpiSaved}</h2>
-        <p className="sub">{fill(t.kpiSavedS, { n: n(v.savings.daysWithZad) })}</p>
-        <p className="big2 good num">{n(v.savings.savedQar)}<small>{t.qar}</small></p>
-      </section>
-    </>
+    <section className="tl kpi" aria-labelledby={id}>
+      <h2 id={id}>{label}</h2>
+      <p className={'big2 num ' + tone}>{value}{unit && <small>{unit}</small>}</p>
+      <p className="sub">{sub}</p>
+    </section>
   );
+}
+function GuestsKpi({ v }: { v: VenueView }) {
+  const { t, n } = useApp();
+  return <Kpi id="k1" label={t.kpiGuests} sub={fill(t.kpiGuestsS, { a: n(v.week[0].lo), b: n(v.week[0].hi) })} value={n(v.guests)} unit={t.guests} />;
+}
+function PrepKpi({ v }: { v: VenueView }) {
+  const { t, n, signed } = useApp();
+  return <Kpi id="k2" label={t.kpiPrep} sub={fill(t.kpiPrepS, { d: `${signed(v.totalKg - v.usualKg)} ${t.kg}`, u: n(v.usualKg) })} value={n(v.totalKg)} unit={t.kg} />;
+}
+function SaveKpi({ v }: { v: VenueView }) {
+  const { t, n } = useApp();
+  return <Kpi id="k5" label={t.kpiSave} sub={fill(t.kpiSaveS, { kg: n(v.saveKg) })} value={n(v.saveQar)} unit={t.qar} tone="good" />;
+}
+function WasteKpi({ v }: { v: VenueView }) {
+  const { t, pct } = useApp();
+  return <Kpi id="k3" label={t.kpiWaste} sub={fill(t.kpiWasteS, { p: pct(v.savings.rateBefore) })} value={pct(v.rate7)} tone="good" />;
+}
+function SavedKpi({ v }: { v: VenueView }) {
+  const { t, n } = useApp();
+  return <Kpi id="k4" label={t.kpiSaved} sub={fill(t.kpiSavedS, { n: n(v.savings.daysWithZad) })} value={n(v.savings.savedQar)} unit={t.qar} tone="good" />;
+}
+function FoodKpi({ v }: { v: VenueView }) {
+  const { t, n } = useApp();
+  return <Kpi id="k6" label={t.kpiFood} sub={fill(t.kpiFoodS, { n: n(v.savings.savedMeals) })} value={n(v.savings.savedKg)} unit={t.kg} tone="good" />;
+}
+function PrepDayKpi({ v }: { v: VenueView }) {
+  const { t, n } = useApp();
+  return <Kpi id="k7" label={t.kpiPrepDay} sub={fill(t.kpiPrepDayS, { a: n(v.savings.avgPreparedBeforeKg) })} value={n(v.savings.avgPreparedWithKg)} unit={t.kg} />;
 }
 
 function DishTile({ v }: { v: VenueView }) {
@@ -102,7 +155,7 @@ function DishTile({ v }: { v: VenueView }) {
   const rows = v.plan.filter((p) => svc === 'all' || p.dish.service === svc).sort((a, b) => b.fcKg - a.fcKg);
   const max = Math.max(...v.plan.map((p) => Math.max(p.usualKg, p.fcKg)), 1);
   return (
-    <section className="tl span2 row2" aria-labelledby="dish-h">
+    <section className="tl span2" aria-labelledby="dish-h">
       <h2 id="dish-h">{t.dishH}</h2>
       <p className="sub">{t.dishS}</p>
       <div className="legend">
@@ -205,7 +258,7 @@ function AccuracyTile({ v }: { v: VenueView }) {
   const { t, pct } = useApp();
   const days = v.accuracy.days;
   return (
-    <section className="tl" aria-labelledby="acc-h">
+    <section className="tl span2" aria-labelledby="acc-h">
       <h2 id="acc-h">{t.accH}</h2>
       <p className="sub">{t.accS}</p>
       <p className="big2 good num">{pct(v.accuracy.accuracy)}</p>
@@ -215,7 +268,7 @@ function AccuracyTile({ v }: { v: VenueView }) {
             <span><i style={{ background: 'var(--ink)' }} />{t.actual}</span>
             <span><i className="dash" style={{ borderColor: 'var(--palm)' }} />{t.forecast}</span>
           </div>
-          <LineChart height={120} dates={days.map((d) => d.date)} label={t.accChartLabel} series={[
+          <LineChart height={170} dates={days.map((d) => d.date)} label={t.accChartLabel} series={[
             { name: 'a', values: days.map((d) => d.guestsActual), color: 'var(--ink)' },
             { name: 'f', values: days.map((d) => d.guestsForecast), color: 'var(--palm)', dash: true },
           ]} />
@@ -228,15 +281,7 @@ function AccuracyTile({ v }: { v: VenueView }) {
 function LeftTile() {
   const { t, n, log } = useApp();
   const { safe, total } = leftoverTotals(log);
-  return (
-    <section className="tl" aria-labelledby="left-h">
-      <h2 id="left-h">{t.leftTileH}</h2>
-      <p className="sub">{t.leftTileS}</p>
-      <p className="big2 good num">{n(safe, 1)}<small>{t.kg}</small></p>
-      <p className="foot">{t.logTotal}: {n(total, 1)} {t.kg}</p>
-      <DonateButton compact />
-    </section>
-  );
+  return <Kpi id="left-h" label={t.leftTileH} sub={`${t.logTotal}: ${n(total, 1)} ${t.kg}`} value={n(safe, 1)} unit={t.kg} tone="good" />;
 }
 
 function WhyPanel({ v }: { v: VenueView }) {
@@ -322,7 +367,7 @@ function MlPanel({ v }: { v: VenueView }) {
         { name: 'm', values: bt.model, color: 'var(--indigo)', dash: true, dots: true },
       ]} />
       <details>
-        <summary style={{ cursor: 'pointer', fontWeight: 700, minHeight: 44, display: 'flex', alignItems: 'center' }}>{t.mlFeatures}</summary>
+        <summary>{t.mlFeatures}</summary>
         <table className="coef">
           <tbody>
             {ref.map((d, i) => (
@@ -377,7 +422,7 @@ function LeftoverLog({ v }: { v: VenueView }) {
   const tot = leftoverTotals(log);
   const dish = (id: string) => v.dishes.find((d) => d.id === id)!;
   return (
-    <section className="tl span4" id="log" aria-labelledby="log-h">
+    <section className="tl span2" id="log" aria-labelledby="log-h">
       <h2 id="log-h">{t.logH}</h2>
       <p className="sub">{t.logS}</p>
       <div className="log-wrap">
@@ -417,6 +462,7 @@ function LeftoverLog({ v }: { v: VenueView }) {
           </tfoot>
         </table>
       </div>
+      <DonateButton compact />
       <div className="log-foot">
         <span>{t.rule}</span>
         <span>{logDate && fill(t.logDate, { d: fmtDate(lang, logDate, { day: 'numeric', month: 'long' }) })} <button type="button" className="linkbtn" onClick={() => { resetLog(); setDraft({}); }}>{t.logReset}</button></span>

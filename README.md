@@ -7,8 +7,8 @@ A student research prototype. **All businesses and numbers are sample data.**
 | Page | Route | For |
 |---|---|---|
 | About | `#about` | Judges: the story in under a minute, with a live "tomorrow's prep ticket" |
-| Owner | `#owner` | The owner, on a phone, in Arabic: "Tomorrow, cook about X kg" |
-| Kitchen | `#kitchen` | Head chef: tile dashboard, "Why this number?", model accuracy, leftover log |
+| Owner | `#owner` | The owner, on a phone, in Arabic: "Tomorrow, cook about X kg", what to tell the kitchen, savings and the donate button; the rest folds under "More details" |
+| Kitchen | `#kitchen` | Head chef: three tabs. Plan (prep by dish, cooking plan, leftover log), Insights (waste and savings), Forecast (week, calendar, "Why this number?", model accuracy) |
 | Data | `#data` | Every CSV as a table, data warnings, and a session-only CSV upload |
 
 Arabic (RTL) is the default; English is one tap away. Venue, language and theme are remembered. It works offline after the first visit.
